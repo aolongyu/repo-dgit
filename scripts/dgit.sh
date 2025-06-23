@@ -4,6 +4,13 @@
 # 用于生成符合规范的Git提交信息
 # 兼容Linux Bash和Windows Git Bash
 
+# 加载公共配置
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
+# 检查版本更新（在开始执行前）
+check_version_update
+
 # 获取脚本所在目录
 get_script_dir() {
     if [[ -n "$ZSH_VERSION" ]]; then

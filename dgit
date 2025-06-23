@@ -3,6 +3,10 @@
 # dgit - 跨平台Git提交辅助工具
 # 支持macOS、Linux、Windows (Git Bash/PowerShell)
 
+# 版本信息
+DGIT_VERSION="1.0.0"
+DGIT_RELEASE_DATE="2025-01-27"
+
 # 获取脚本所在目录（兼容zsh和bash，处理符号链接）
 get_script_dir() {
     if [[ -n "$ZSH_VERSION" ]]; then
@@ -41,6 +45,13 @@ detect_shell() {
     fi
 }
 
+# 显示版本信息
+show_version() {
+    echo "dgit version $DGIT_VERSION"
+    echo "Release date: $DGIT_RELEASE_DATE"
+    echo "技术支持：敖龙宇 / longyu.ao@dmall.com"
+}
+
 # 显示帮助信息
 show_help() {
     echo ""
@@ -55,9 +66,18 @@ show_help() {
     echo "命令:"
     echo "  dgit commit    # 生成Git提交信息"
     echo "  dgit alias     # 管理需求单号别名"
+    echo "  dgit version   # 版本管理（更新/回退到指定版本）"
     echo "  dgit help      # 显示帮助信息"
+    echo "  dgit --version # 显示版本信息"
     echo ""
 }
+
+# 检查命令参数
+# 检查版本参数
+if [[ "$1" == "--version" ]] || [[ "$1" == "-v" ]]; then
+    show_version
+    exit 0
+fi
 
 if [[ "$1" == "help" ]]; then
     show_help
@@ -90,13 +110,41 @@ if [[ "$1" == "alias" ]]; then
     esac
 fi
 
+if [[ "$1" == "version" ]]; then
+    # 版本管理命令
+    shell_type=$(detect_shell)
+    
+    case "$shell_type" in
+        "powershell")
+            # PowerShell环境
+            if [[ -f "$SCRIPT_DIR/scripts/version_manager.ps1" ]]; then
+                exec pwsh -File "$SCRIPT_DIR/scripts/version_manager.ps1" "${@:2}"
+            else
+                echo "错误: 找不到 scripts/version_manager.ps1 脚本"
+                exit 1
+            fi
+            ;;
+        *)
+            # Bash/Zsh环境
+            if [[ -f "$SCRIPT_DIR/scripts/version_manager.sh" ]]; then
+                exec "$SCRIPT_DIR/scripts/version_manager.sh" "${@:2}"
+            else
+                echo "错误: 找不到 scripts/version_manager.sh 脚本"
+                exit 1
+            fi
+            ;;
+    esac
+fi
+
 if [[ "$1" != "commit" ]]; then
     echo "用法: dgit <命令> [参数...]"
     echo ""
     echo "命令:"
     echo "  commit    # 生成Git提交信息"
     echo "  alias     # 管理需求单号别名"
+    echo "  version   # 版本管理（更新/回退到指定版本）"
     echo "  help      # 显示帮助信息"
+    echo "  --version # 显示版本信息"
     echo ""
     exit 1
 fi

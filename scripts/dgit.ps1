@@ -4,6 +4,13 @@
 # 用于生成符合规范的Git提交信息
 # 兼容Windows PowerShell
 
+# 加载公共配置
+$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+. "$SCRIPT_DIR\common.ps1"
+
+# 检查版本更新（在开始执行前）
+Check-VersionUpdate
+
 # 获取脚本所在目录
 function Get-ScriptDirectory {
     $scriptPath = $MyInvocation.MyCommand.Path

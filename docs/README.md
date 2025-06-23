@@ -21,6 +21,7 @@
 
 ### 使用指南
 - [📖 使用示例](./usage-examples.md) - 详细的使用示例和最佳实践
+- [🔄 版本控制功能](./version-control.md) - 版本检测和自动更新功能
 
 ## 🚀 快速开始
 
@@ -68,6 +69,8 @@
 - ✅ **数据验证**: 自动验证输入数据的完整性
 - 🎯 **规范遵循**: 符合多点Git仓库管理规范
 - 🔧 **别名管理**: 支持需求单号别名管理
+- 🔄 **版本控制**: 自动检测新版本并提供更新选项
+- 🛡️ **安全更新**: 自动备份本地修改，更新后恢复
 
 ## 📖 使用示例
 
@@ -82,7 +85,31 @@ dgit alias add DOP-123 "用户登录功能开发"
 
 # 查看帮助信息
 dgit help
+
+# 查看版本信息
+dgit --version
 ```
+
+### 版本控制
+
+dgit 集成了智能版本控制功能：
+
+```bash
+# 查看当前版本
+dgit --version
+
+# 输出示例
+dgit version 1.0.0
+Release date: 2025-01-27
+GitHub: https://github.com/aolongyu/repo-dgit.git
+```
+
+**自动更新特性**：
+- 🔄 每次运行时自动检查新版本
+- 📅 每天最多检查一次，避免频繁网络请求
+- 🌐 支持离线使用，网络不可用时自动跳过
+- 🛡️ 自动备份本地修改，更新后恢复
+- ⚙️ 支持临时禁用自动检查
 
 ### 提交类型
 
@@ -144,6 +171,11 @@ hotfix: DOP-789, 紧急修复数据库连接问题
    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    ```
 
+5. **版本更新失败**
+   - 检查网络连接：`ping api.github.com`
+   - 检查Git配置：`git config --list`
+   - 手动更新：`git pull origin master`
+
 ### 调试模式
 
 启用调试信息：
@@ -156,6 +188,13 @@ $env:DGIT_DEBUG = "1"
 
 # 运行命令
 dgit commit
+```
+
+### 禁用自动更新
+
+```bash
+# 临时禁用
+export DGIT_DISABLE_UPDATE_CHECK=1
 ```
 
 ## 📚 详细文档
@@ -190,9 +229,17 @@ dgit commit
   - 最佳实践
   - 常见问题解答
 
+- [版本控制功能](./version-control.md)
+  - 自动版本检测
+  - 更新机制说明
+  - 配置选项
+  - 故障排除
+  - 最佳实践
+
 ### 高级功能
 
 - **别名管理**: 管理常用的需求单号别名
+- **版本控制**: 自动检测和更新到最新版本
 - **系统集成**: 桌面快捷方式、右键菜单
 - **环境配置**: 剪贴板支持、编码设置
 
