@@ -51,11 +51,48 @@ if [[ "$1" == "help" ]]; then
     echo "  - Linux (bash)"
     echo "  - Windows (PowerShell/Git Bash)"
     echo ""
+    echo "命令:"
+    echo "  dgit commit    # 生成Git提交信息"
+    echo "  dgit alias     # 管理需求单号别名"
+    echo "  dgit help      # 显示帮助信息"
+    echo ""
     exit 1
 fi
 
+if [[ "$1" == "alias" ]]; then
+    # 别名管理命令
+    shell_type=$(detect_shell)
+    
+    case "$shell_type" in
+        "powershell")
+            # PowerShell环境
+            if [[ -f "$SCRIPT_DIR/scripts/alias_manager.ps1" ]]; then
+                exec pwsh -File "$SCRIPT_DIR/scripts/alias_manager.ps1" "${@:2}"
+            else
+                echo "错误: 找不到 scripts/alias_manager.ps1 脚本"
+                exit 1
+            fi
+            ;;
+        *)
+            # Bash/Zsh环境
+            if [[ -f "$SCRIPT_DIR/scripts/alias_manager.sh" ]]; then
+                exec "$SCRIPT_DIR/scripts/alias_manager.sh" "${@:2}"
+            else
+                echo "错误: 找不到 scripts/alias_manager.sh 脚本"
+                exit 1
+            fi
+            ;;
+    esac
+fi
+
 if [[ "$1" != "commit" ]]; then
-    echo "用法: dgit commit"
+    echo "用法: dgit <命令> [参数...]"
+    echo ""
+    echo "命令:"
+    echo "  commit    # 生成Git提交信息"
+    echo "  alias     # 管理需求单号别名"
+    echo "  help      # 显示帮助信息"
+    echo ""
     exit 1
 fi
 
