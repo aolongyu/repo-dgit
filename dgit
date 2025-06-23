@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+# dgit - 跨平台Git提交辅助工具
+# 支持macOS、Linux、Windows (Git Bash/PowerShell)
+
+# 获取脚本所在目录（兼容zsh和bash，处理符号链接）
+get_script_dir() {
+    if [[ -n "$ZSH_VERSION" ]]; then
+        # zsh环境
+        local script_path
+        script_path=$(readlink -f "$0" 2>/dev/null || echo "$0")
+        echo "$(cd "$(dirname "$script_path")" && pwd)"
+    else
+        # bash环境
+        local script_path
+        script_path=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "${BASH_SOURCE[0]}")
+        echo "$(cd "$(dirname "$script_path")" && pwd)"
+    fi
+}
+
+SCRIPT_DIR=$(get_script_dir)
+
+# 检测shell类型
+detect_shell() {
+    if [[ -n "$ZSH_VERSION" ]]; then
+        echo "zsh"
+    elif [[ -n "$BASH_VERSION" ]]; then
+        echo "bash"
+    elif [[ -n "$POWERSHELL_VERSION" ]] || [[ "$(basename "$SHELL")" == "pwsh" ]]; then
+        echo "powershell"
+    else
+        # 尝试检测父进程
+        local parent_shell
+        parent_shell=$(ps -p $$ -ocomm= 2>/dev/null || echo "")
+        case "$parent_shell" in
+            *zsh) echo "zsh" ;;
+            *bash) echo "bash" ;;
+            *pwsh|*powershell) echo "powershell" ;;
+            *) echo "bash" ;;
+        esac
+    fi
+}
+
+if [[ "$1" == "help" ]]; then
+    echo ""
+    echo "多点Git仓库管理规范：https://duodian.feishu.cn/wiki/X9wRwzeM7i39iQk7TxZccBdFnvb"
+    echo "更多问题飞书联系：敖龙宇 / longyu.ao@dmall.com"
+    echo ""
+    echo "支持的平台:"
+    echo "  - macOS (zsh/bash)"
+    echo "  - Linux (bash)"
+    echo "  - Windows (PowerShell/Git Bash)"
+    echo ""
+    exit 1
+fi
+
+if [[ "$1" != "commit" ]]; then
+    echo "用法: dgit commit"
+    exit 1
+fi
+
+# 检测shell类型并调用相应脚本
+shell_type=$(detect_shell)
+
+case "$shell_type" in
+    "powershell")
+        # PowerShell环境
+        if [[ -f "$SCRIPT_DIR/scripts/dgit.ps1" ]]; then
+            exec pwsh -File "$SCRIPT_DIR/scripts/dgit.ps1" "$@"
+        else
+            echo "错误: 找不到 scripts/dgit.ps1 脚本"
+            exit 1
+        fi
+        ;;
+    *)
+        # Bash/Zsh环境
+        if [[ -f "$SCRIPT_DIR/scripts/dgit.sh" ]]; then
+            exec "$SCRIPT_DIR/scripts/dgit.sh" "$@"
+        else
+            echo "错误: 找不到 scripts/dgit.sh 脚本"
+            exit 1
+        fi
+        ;;
+esac
