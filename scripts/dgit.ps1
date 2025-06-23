@@ -87,9 +87,12 @@ $commitTypes = @(
     "其他(others)"
 )
 
+# 定义需要单号的提交类型
+$typesNeedIssue = @("feature", "fix", "hotfix")
+
 # 显示提交类型选择
 Write-Host ""
-Write-Host "(1/4) 请选择提交类型:"
+Write-Host "请选择提交类型:"
 for ($i = 0; $i -lt $commitTypes.Count; $i++) {
     Write-Host "$($i+1). $($commitTypes[$i])"
 }
@@ -108,52 +111,70 @@ do {
 # 提取类型简写（括号内部分）
 $typeShort = $selectedType -replace '.*\((.*)\).*', '$1'
 
-# 获取问题编号（支持别名选择）
-Write-Host ""
-Write-Host "(2/4) 需求单号输入:"
-Write-Host "请选择输入方式:"
-Write-Host "1. 使用别名选择"
-Write-Host "2. 手动输入单号"
+# 检查是否需要输入单号
+$needIssue = $false
+foreach ($type in $typesNeedIssue) {
+    if ($typeShort -eq $type) {
+        $needIssue = $true
+        break
+    }
+}
 
-# 第一步：选择输入方式
-do {
-    $inputChoice = Read-Host "请输入选择 (1-2)"
-    if ($inputChoice -eq "1") {
-        # 选择使用别名
-        Write-Host ""
-        $aliasResult = Show-AliasMenu
-        if ($aliasResult) {
-            # 用户选择了别名
-            $issueNumber = $aliasResult
+# 获取问题编号（如果需要）
+if ($needIssue) {
+    Write-Host ""
+    Write-Host "(1/3) 需求单号输入:"
+    Write-Host "请选择输入方式:"
+    Write-Host "1. 使用别名选择"
+    Write-Host "2. 手动输入单号"
+
+    # 第一步：选择输入方式
+    do {
+        $inputChoice = Read-Host "请输入选择 (1-2)"
+        if ($inputChoice -eq "1") {
+            # 选择使用别名
             Write-Host ""
-            Write-Host "✓ 已选择别名对应的单号: $issueNumber"
-            break
-        } else {
-            # 没有可用的别名
-            Write-Host ""
-            Write-Host "没有可用的别名，请选择手动输入"
-            continue
-        }
-    } elseif ($inputChoice -eq "2") {
-        # 选择手动输入
-        Write-Host ""
-        do {
-            $issueNumber = Read-Host "请输入需求单号(必填)"
-            if ($issueNumber) {
+            $aliasResult = Show-AliasMenu
+            if ($aliasResult) {
+                # 用户选择了别名
+                $issueNumber = $aliasResult
+                Write-Host ""
+                Write-Host "✓ 已选择别名对应的单号: $issueNumber"
                 break
             } else {
-                Write-Host "需求单号不能为空!"
+                # 没有可用的别名
+                Write-Host ""
+                Write-Host "没有可用的别名，请选择手动输入"
+                continue
             }
-        } while ($true)
-        break
-    } else {
-        Write-Host "无效选择，请输入 1 或 2"
-    }
-} while ($true)
+        } elseif ($inputChoice -eq "2") {
+            # 选择手动输入
+            Write-Host ""
+            do {
+                $issueNumber = Read-Host "请输入需求单号(必填)"
+                if ($issueNumber) {
+                    break
+                } else {
+                    Write-Host "需求单号不能为空!"
+                }
+            } while ($true)
+            break
+        } else {
+            Write-Host "无效选择，请输入 1 或 2"
+        }
+    } while ($true)
+} else {
+    # 不需要单号的类型，直接进入描述输入
+    $issueNumber = ""
+}
 
 # 获取提交描述
 Write-Host ""
-Write-Host "(3/4) 请输入提交描述:"
+if ($needIssue) {
+    Write-Host "(2/3) 请输入提交描述:"
+} else {
+    Write-Host "(1/2) 请输入提交描述:"
+}
 do {
     $commitDescription = Read-Host "请输入提交描述(必填)"
     if ($commitDescription) {
@@ -164,9 +185,15 @@ do {
 } while ($true)
 
 # 生成并显示提交信息
-$commitMsg = "$typeShort`: $issueNumber, $commitDescription"
-Write-Host ""
-Write-Host "(4/4) 确认提交信息:"
+if ($needIssue) {
+    $commitMsg = "$typeShort`: $issueNumber, $commitDescription"
+    Write-Host ""
+    Write-Host "(3/3) 确认提交信息:"
+} else {
+    $commitMsg = "$typeShort`: $commitDescription"
+    Write-Host ""
+    Write-Host "(2/2) 确认提交信息:"
+}
 Write-Host "多点Git仓库管理规范：https://duodian.feishu.cn/wiki/X9wRwzeM7i39iQk7TxZccBdFnvb"
 Write-Host "生成的提交信息:"
 Write-Host "----------------------------------------"

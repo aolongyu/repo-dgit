@@ -95,9 +95,12 @@ commit_types=(
   "其他(others)"
 )
 
+# 定义需要单号的提交类型
+types_need_issue=("feature" "fix" "hotfix")
+
 # 显示提交类型选择
 echo ""
-echo "(1/4) 请选择提交类型:"
+echo "请选择提交类型:"
 for i in "${!commit_types[@]}"; do
   echo "$((i+1)). ${commit_types[$i]}"
 done
@@ -116,52 +119,70 @@ done
 # 提取类型简写（括号内部分）
 type_short=$(echo "$selected_type" | sed -E 's/.*\((.*)\).*/\1/')
 
-# 获取问题编号（支持别名选择）
-echo ""
-echo "(2/4) 需求单号输入:"
-echo "请选择输入方式:"
-echo "1. 使用别名选择"
-echo "2. 手动输入单号"
-
-# 第一步：选择输入方式
-while true; do
-    read -p "请输入选择 (1-2): " input_choice
-    if [[ "$input_choice" == "1" ]]; then
-        # 选择使用别名
-        echo ""
-        alias_result=$(show_alias_menu)
-        if [[ $? -eq 0 ]]; then
-            # 用户选择了别名
-            issue_number="$alias_result"
-            echo ""
-            echo "✓ 已选择别名对应的单号: $issue_number"
-            break
-        else
-            # 没有可用的别名
-            echo ""
-            echo "没有可用的别名，请选择手动输入"
-            continue
-        fi
-    elif [[ "$input_choice" == "2" ]]; then
-        # 选择手动输入
-        echo ""
-        while true; do
-            read -p "请输入需求单号(必填): " issue_number
-            if [[ -n "$issue_number" ]]; then
-                break
-            else
-                echo "需求单号不能为空!"
-            fi
-        done
+# 检查是否需要输入单号
+need_issue=false
+for type in "${types_need_issue[@]}"; do
+    if [[ "$type_short" == "$type" ]]; then
+        need_issue=true
         break
-    else
-        echo "无效选择，请输入 1 或 2"
     fi
 done
 
+# 获取问题编号（如果需要）
+if [[ "$need_issue" == "true" ]]; then
+    echo ""
+    echo "(1/3) 需求单号输入:"
+    echo "请选择输入方式:"
+    echo "1. 使用别名选择"
+    echo "2. 手动输入单号"
+
+    # 第一步：选择输入方式
+    while true; do
+        read -p "请输入选择 (1-2): " input_choice
+        if [[ "$input_choice" == "1" ]]; then
+            # 选择使用别名
+            echo ""
+            alias_result=$(show_alias_menu)
+            if [[ $? -eq 0 ]]; then
+                # 用户选择了别名
+                issue_number="$alias_result"
+                echo ""
+                echo "✓ 已选择别名对应的单号: $issue_number"
+                break
+            else
+                # 没有可用的别名
+                echo ""
+                echo "没有可用的别名，请选择手动输入"
+                continue
+            fi
+        elif [[ "$input_choice" == "2" ]]; then
+            # 选择手动输入
+            echo ""
+            while true; do
+                read -p "请输入需求单号(必填): " issue_number
+                if [[ -n "$issue_number" ]]; then
+                    break
+                else
+                    echo "需求单号不能为空!"
+                fi
+            done
+            break
+        else
+            echo "无效选择，请输入 1 或 2"
+        fi
+    done
+else
+    # 不需要单号的类型，直接进入描述输入
+    issue_number=""
+fi
+
 # 获取提交描述
 echo ""
-echo "(3/4) 请输入提交描述:"
+if [[ "$need_issue" == "true" ]]; then
+    echo "(2/3) 请输入提交描述:"
+else
+    echo "(1/2) 请输入提交描述:"
+fi
 while true; do
   read -p "请输入提交描述(必填): " commit_description
   if [[ -n "$commit_description" ]]; then
@@ -172,9 +193,15 @@ while true; do
 done
 
 # 生成并显示提交信息
-commit_msg="$type_short: $issue_number, $commit_description"
-echo ""
-echo "(4/4) 确认提交信息:"
+if [[ "$need_issue" == "true" ]]; then
+    commit_msg="$type_short: $issue_number, $commit_description"
+    echo ""
+    echo "(3/3) 确认提交信息:"
+else
+    commit_msg="$type_short: $commit_description"
+    echo ""
+    echo "(2/2) 确认提交信息:"
+fi
 echo "多点Git仓库管理规范：https://duodian.feishu.cn/wiki/X9wRwzeM7i39iQk7TxZccBdFnvb"
 echo "生成的提交信息:"
 echo "----------------------------------------"
