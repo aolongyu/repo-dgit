@@ -2,6 +2,15 @@
 
 一个智能的Git提交信息生成工具，支持macOS、Linux和Windows平台，帮助开发者生成符合规范的Git提交信息。
 
+## 📚 安装指南
+
+根据不同执行环境，我们提供了详细的安装和使用文档：
+
+- [📋 完整安装指南](./docs/README.md) - 所有平台的安装指南汇总
+- [🍎 macOS 安装指南](./docs/installation-macos.md) - macOS环境安装和使用
+- [🐧 Linux 安装指南](./docs/installation-linux.md) - Linux环境安装和使用
+- [🪟 Windows 安装指南](./docs/installation-windows.md) - Windows环境安装和使用
+
 ## 功能特性
 
 - 🌍 **跨平台支持**: 支持macOS、Linux和Windows
@@ -19,13 +28,13 @@
 | Windows | Git Bash      | `scripts/dgit.sh`   |
 | Windows | PowerShell    | `scripts/dgit.ps1`  |
 
-## 安装方法
+## 快速安装
 
 ### 方法1: 使用安装脚本（推荐）
 
 ```bash
 # 克隆或下载项目
-git clone <repository-url>
+git clone https://github.com/aolongyu/repo-dgit.git
 cd repo-dgit
 
 # 运行安装脚本
@@ -97,6 +106,12 @@ zhangsan@example.com
 repo-dgit/
 ├── dgit                # 通用启动脚本（自动检测平台和Shell）
 ├── install.sh          # 安装脚本
+├── docs/               # 详细安装文档
+│   ├── README.md       # 文档汇总
+│   ├── installation-macos.md
+│   ├── installation-linux.md
+│   ├── installation-windows.md
+│   └── usage-examples.md
 ├── scripts/
 │   ├── dgit.sh         # Bash/Zsh版本（macOS/Linux/Windows Git Bash）
 │   └── dgit.ps1        # PowerShell版本（Windows）
