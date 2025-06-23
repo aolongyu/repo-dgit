@@ -37,7 +37,7 @@ main() {
     echo ""
     
     # 检查必要文件是否存在
-    local required_files=("dgit" "scripts/dgit.sh" "scripts/dgit.ps1")
+    local required_files=("dgit" "scripts/dgit.sh" "scripts/dgit.ps1" "scripts/common.sh" "scripts/common.ps1")
     echo "检查必要文件..."
     for file in "${required_files[@]}"; do
         if [[ -f "$SCRIPT_DIR/$file" ]]; then
@@ -55,6 +55,8 @@ main() {
     chmod +x "$SCRIPT_DIR/dgit"
     chmod +x "$SCRIPT_DIR/scripts/dgit.sh"
     chmod +x "$SCRIPT_DIR/scripts/dgit.ps1"
+    chmod +x "$SCRIPT_DIR/scripts/common.sh"
+    chmod +x "$SCRIPT_DIR/scripts/common.ps1"
     echo "✓ 执行权限设置完成"
     echo ""
     

@@ -41,7 +41,8 @@ detect_shell() {
     fi
 }
 
-if [[ "$1" == "help" ]]; then
+# 显示帮助信息
+show_help() {
     echo ""
     echo "多点Git仓库管理规范：https://duodian.feishu.cn/wiki/X9wRwzeM7i39iQk7TxZccBdFnvb"
     echo "更多问题飞书联系：敖龙宇 / longyu.ao@dmall.com"
@@ -56,6 +57,10 @@ if [[ "$1" == "help" ]]; then
     echo "  dgit alias     # 管理需求单号别名"
     echo "  dgit help      # 显示帮助信息"
     echo ""
+}
+
+if [[ "$1" == "help" ]]; then
+    show_help
     exit 1
 fi
 

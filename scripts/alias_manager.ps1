@@ -4,8 +4,16 @@
 # 用于管理需求单号的别名
 
 # 获取脚本所在目录
-$SCRIPT_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ALIAS_FILE = Join-Path $SCRIPT_DIR "..\.dgit_aliases"
+function Get-ScriptDirectory {
+    $scriptPath = $MyInvocation.MyCommand.Path
+    if (-not $scriptPath) {
+        $scriptPath = $PSCommandPath
+    }
+    return Split-Path -Parent $scriptPath
+}
+
+$SCRIPT_DIR = Get-ScriptDirectory
+$ALIAS_FILE = Join-Path (Split-Path $SCRIPT_DIR -Parent) ".dgit_aliases"
 
 # 确保别名文件存在
 function Ensure-AliasFile {
